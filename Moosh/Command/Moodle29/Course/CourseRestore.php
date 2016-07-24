@@ -159,7 +159,6 @@ class CourseRestore extends MooshCommand {
             $setting = $task->get_setting('enrol_migratetomanual');
             $setting->set_value('1');
         }
-        $rc->execute_precheck();
 
         if ($options['existing'] && $options['overwrite']) {
             // If existing course shall be overwritten, delete current content
@@ -168,8 +167,17 @@ class CourseRestore extends MooshCommand {
             $deletingoptions['keep_groups_and_groupings'] = 0;
             restore_dbops::delete_course_content($courseid, $deletingoptions);
         }
-
-        $rc->execute_plan();
+        if ($rc->execute_precheck()) {
+            $rc->execute_plan();
+        } else {
+            echo "Precheck fails for ".$sourcefile->getFilename()." ... skipping \n";
+            $results = $controller->get_precheck_results();
+            foreach ($results as $type => $messages) {
+                foreach ($messages as $index => $message) {
+                    echo "precheck ".$type."[".$index."] = ".$message."\n";
+                }
+            }
+        }
         $rc->destroy();
 
         echo "New course ID for '$shortname': $courseid in category {$category->id}\n";
