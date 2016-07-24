@@ -170,7 +170,7 @@ class CourseRestore extends MooshCommand {
         if ($rc->execute_precheck()) {
             $rc->execute_plan();
         } else {
-            echo "Precheck fails for ".$sourcefile->getFilename()." ... skipping \n";
+            echo "Precheck fails for ".$arguments[0]." ... skipping \n";
             $results = $controller->get_precheck_results();
             foreach ($results as $type => $messages) {
                 foreach ($messages as $index => $message) {
